@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 const adoptionSchema = z.object({
@@ -47,9 +47,12 @@ type AdoptionFormData = z.infer<typeof adoptionSchema>
 export function AdoptionForm() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState('')
-
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<AdoptionFormData>({
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([])
+  const [uploadError, setUploadError] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  const { register, handleSubmit, formState: { errors } } = useForm<AdoptionFormData>({
     resolver: zodResolver(adoptionSchema),
     defaultValues: {
       seComprometeCastrar: false,
@@ -59,6 +62,42 @@ export function AdoptionForm() {
     }
   })
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setIsUploading(true)
+    setUploadError('')
+
+    try {
+      const formData = new FormData()
+      Array.from(files).forEach(file => {
+        formData.append('files', file)
+      })
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) throw new Error('Error al subir fotos')
+
+      const data = await res.json()
+      setUploadedPhotos(prev => [...prev, ...data.urls])
+    } catch (err) {
+      setUploadError('Error al subir las fotos. Intentá de nuevo.')
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const removePhoto = (url: string) => {
+    setUploadedPhotos(prev => prev.filter(p => p !== url))
+  }
+
   const onSubmit = async (data: AdoptionFormData) => {
     setIsSubmitting(true)
     setError('')
@@ -67,14 +106,17 @@ export function AdoptionForm() {
       const res = await fetch('/api/forms/adoption', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          photos: uploadedPhotos,
+        }),
       })
 
       if (!res.ok) throw new Error('Error al enviar')
 
       const { token } = await res.json()
       router.push(`/gracias?token=${token}&type=adoption`)
-    } catch (e) {
+    } catch (err) {
       setError('Hubo un error. Intentá de nuevo.')
     } finally {
       setIsSubmitting(false)
@@ -150,6 +192,55 @@ export function AdoptionForm() {
           <label className="block text-sm font-medium mb-1">¿Tenés patio cerrado? ¿Nos podrías enviar fotos? *</label>
           <input {...register('tienePatioCerrado')} className="w-full p-3 border rounded-lg" />
           {errors.tienePatioCerrado && <p className="text-[--error] text-sm mt-1">{errors.tienePatioCerrado.message}</p>}
+        </div>
+
+        {/* Upload de fotos */}
+        <div>
+          <label className="block text-sm font-medium mb-1">📷 Fotos de tu vivienda (opcional)</label>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileUpload}
+              className="hidden"
+              id="housing-photos"
+            />
+            <label htmlFor="housing-photos" className="cursor-pointer">
+              <div className="text-4xl mb-2">📸</div>
+              <p className="text-sm text-[--text-muted]">
+                {isUploading ? 'Subiendo...' : 'Hacé click para seleccionar fotos'}
+              </p>
+              <p className="text-xs text-[--text-muted] mt-1">Máximo 5MB por imagen</p>
+            </label>
+          </div>
+          
+          {uploadError && <p className="text-[--error] text-sm mt-1">{uploadError}</p>}
+          
+          {uploadedPhotos.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-medium mb-2">Fotos subidas ({uploadedPhotos.length}):</p>
+              <div className="flex flex-wrap gap-2">
+                {uploadedPhotos.map((url, idx) => (
+                  <div key={idx} className="relative group">
+                    <img 
+                      src={url} 
+                      alt={`Foto ${idx + 1}`}
+                      className="w-20 h-20 object-cover rounded-lg border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(url)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -241,14 +332,12 @@ export function AdoptionForm() {
         </div>
       </div>
 
-      {error && <p className="text-[--error] text-center">{error}</p>}
-
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || isUploading}
         className="w-full bg-[--primary] text-white py-4 rounded-xl font-semibold text-lg hover:bg-[--primary-light] transition disabled:opacity-50"
       >
-        {isSubmitting ? 'Enviando...' : 'Enviar solicitud'}
+        {isSubmitting ? 'Enviando...' : isUploading ? 'Subiendo fotos...' : 'Enviar solicitud'}
       </button>
     </form>
   )
