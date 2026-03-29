@@ -1,6 +1,8 @@
 import Link from 'next/link'
 
-export default function GraciasPage({ searchParams }: { searchParams: Promise<{ token?: string; type?: string }> }) {
+export default async function GraciasPage({ searchParams }: { searchParams: Promise<{ token?: string; type?: string }> }) {
+  const params = await searchParams
+  
   return (
     <div className="min-h-screen bg-[--background] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
@@ -13,7 +15,7 @@ export default function GraciasPage({ searchParams }: { searchParams: Promise<{ 
           <p className="text-sm text-[--text-muted]">
             Guardá este código para hacer seguimiento:
           </p>
-          <p className="font-mono font-bold text-lg mt-2">{searchParams.token ?? 'N/A'}</p>
+          <p className="font-mono font-bold text-lg mt-2">{params.token ?? 'N/A'}</p>
         </div>
         <Link 
           href="/"
