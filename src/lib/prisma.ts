@@ -1,13 +1,18 @@
 import { PrismaClient } from '@prisma/client'
 
-let prisma: PrismaClient | undefined
+let prisma: PrismaClient
 
-export function getPrisma(): PrismaClient {
-  if (!prisma) {
-    // Prisma 7 requires URL passed directly in constructor
-    prisma = new PrismaClient({
-      datasourceUrl: process.env.DATABASE_URL,
-    })
-  }
-  return prisma
+try {
+  prisma = new PrismaClient()
+} catch (e) {
+  console.error('PrismaClient init failed:', e)
+  prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL || 'postgresql://localhost/postgres',
+      },
+    },
+  })
 }
+
+export { prisma }
