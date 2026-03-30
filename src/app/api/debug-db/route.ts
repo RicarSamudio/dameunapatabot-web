@@ -1,28 +1,38 @@
 import { NextResponse } from 'next/server'
-import { getPrisma } from '@/lib/prisma'
+import { PrismaClient } from '@prisma/client'
+
+// Direct instantiation for debugging
+let debugPrisma: PrismaClient
+
+try {
+  debugPrisma = new PrismaClient()
+  console.log('PrismaClient created successfully')
+} catch (e: any) {
+  console.error('PrismaClient creation failed:', e.message)
+  debugPrisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL || 'postgresql://localhost/postgres',
+      },
+    },
+  })
+}
 
 export async function GET() {
-  const url = process.env.DATABASE_URL || ''
-  
-  // Mask password in URL for security
-  const maskedUrl = url.replace(/:([^@]+)@/, ':****@')
-  
   try {
-    const prisma = getPrisma()
-    const count = await prisma.request.count()
+    const count = await debugPrisma.request.count()
     return NextResponse.json({ 
       success: true, 
       requestCount: count,
-      DATABASE_URL_masked: maskedUrl,
-      urlLength: url.length,
+      DATABASE_URL_SET: !!process.env.DATABASE_URL,
+      NODE_ENV: process.env.NODE_ENV,
     })
   } catch (error: any) {
     return NextResponse.json({ 
       success: false, 
       error: error.message,
       code: error.code,
-      DATABASE_URL_masked: maskedUrl,
-      urlLength: url.length,
+      DATABASE_URL_SET: !!process.env.DATABASE_URL,
     }, { status: 500 })
   }
 }
