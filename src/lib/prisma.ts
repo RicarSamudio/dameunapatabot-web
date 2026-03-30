@@ -1,14 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 
-// Lazy initialization to ensure env vars are loaded
 let _prisma: PrismaClient | undefined
 
 export function getPrisma(): PrismaClient {
   if (!_prisma) {
-    // @ts-ignore - Prisma 5 supports datasourceUrl
-    _prisma = new PrismaClient({
-      datasourceUrl: process.env.DATABASE_URL
-    })
+    // Call without arguments - Prisma reads DATABASE_URL from environment
+    _prisma = new PrismaClient()
   }
   return _prisma
 }
