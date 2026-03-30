@@ -3,6 +3,14 @@ FROM node:22-alpine
 
 WORKDIR /app
 
+# Runtime environment variables (injected by Coolify as ARGs, convert to ENV for runtime)
+ARG DATABASE_URL
+ARG NEXTAUTH_SECRET
+ARG NEXTAUTH_URL
+ENV DATABASE_URL=${DATABASE_URL}
+ENV NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+ENV NEXTAUTH_URL=${NEXTAUTH_URL}
+
 # Copy package files and prisma schema
 COPY package*.json prisma/ ./
 
