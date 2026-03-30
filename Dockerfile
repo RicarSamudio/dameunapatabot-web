@@ -16,8 +16,10 @@ ENV NEXTAUTH_URL=${NEXTAUTH_URL}
 # Copy package files and prisma schema
 COPY package*.json prisma/ ./
 
-# Install dependencies and generate Prisma client
-RUN npm install && npx prisma generate
+# Clean install and regenerate Prisma client
+RUN rm -rf node_modules .next && \
+    npm install && \
+    npx prisma generate
 
 # Copy source
 COPY . .
