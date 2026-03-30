@@ -1,6 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { getPrisma } from '@/lib/prisma'
+import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 declare module 'next-auth' {
@@ -9,6 +9,31 @@ declare module 'next-auth' {
       id: string
       email: string
     }
+  }
+}
+
+// Create PrismaClient fresh inside authorize to avoid module-level caching
+async function getAdmin(email: string, password: string) {
+  const prisma = new PrismaClient()
+  
+  try {
+    const admin = await prisma.admin.findUnique({
+      where: { email }
+    })
+
+    if (!admin) {
+      return null
+    }
+
+    const isValid = await bcrypt.compare(password, admin.password)
+
+    if (!isValid) {
+      return null
+    }
+
+    return { id: admin.id, email: admin.email }
+  } finally {
+    await prisma.$disconnect()
   }
 }
 
@@ -25,23 +50,8 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // Call getPrisma() INSIDE authorize so env vars are loaded
-        const prisma = getPrisma()
-        const admin = await prisma.admin.findUnique({
-          where: { email: credentials.email }
-        })
-
-        if (!admin) {
-          return null
-        }
-
-        const isValid = await bcrypt.compare(credentials.password, admin.password)
-
-        if (!isValid) {
-          return null
-        }
-
-        return { id: admin.id, email: admin.email }
+        // Create PrismaClient inside authorize - no caching issues
+        return await getAdmin(credentials.email, credentials.password)
       }
     })
   ],
