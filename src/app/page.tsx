@@ -21,7 +21,10 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-[--primary] to-[--primary-light] text-white py-20 px-4">
+      <section
+        className="text-white py-20 px-4"
+        style={{ background: 'linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%)' }}
+      >
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Rescatamos vidas, encontramos hogares 🐶🐱

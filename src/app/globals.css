@@ -1,17 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #2D7D46;
-  --primary-light: #4A9D63;
-  --secondary: #F4A261;
-  --accent: #E76F51;
-  --background: #FDF8F4;
+  /* Palette aligned to Dame una Pata logo */
+  --primary: #5a1955;
+  --primary-light: #7a2a74;
+  --secondary: #f5c400;
+  --accent: #ff4f6d;
+  --background: #fff6d9;
   --surface: #ffffff;
-  --text: #1A1A1A;
-  --text-muted: #6B7280;
-  --success: #10B981;
-  --warning: #F59E0B;
-  --error: #EF4444;
+  --text: #1e1b22;
+  --text-muted: #4b5563;
+  --success: #0f9d8a;
+  --warning: #b45309;
+  --error: #b91c1c;
 }
 
 @theme inline {
@@ -38,4 +39,26 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading), system-ui, sans-serif;
+}
+
+/* Compatibility layer: existing classes use text-[--token] syntax */
+.text-\[--primary\] { color: var(--primary); }
+.text-\[--text-muted\] { color: var(--text-muted); }
+.text-\[--error\] { color: var(--error); }
+
+.bg-\[--primary\] { background-color: var(--primary); }
+.bg-\[--primary-light\] { background-color: var(--primary-light); }
+.bg-\[--background\] { background-color: var(--background); }
+.bg-\[--text\] { background-color: var(--text); }
+
+.hover\:bg-\[--primary-light\]:hover { background-color: var(--primary-light); }
+
+.from-\[--primary\] {
+  --tw-gradient-from: var(--primary) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(from var(--primary) r g b / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-from), var(--tw-gradient-to));
+}
+
+.to-\[--primary-light\] {
+  --tw-gradient-to: var(--primary-light) var(--tw-gradient-to-position);
 }
