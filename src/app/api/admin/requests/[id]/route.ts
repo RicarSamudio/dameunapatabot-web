@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { getPrisma } from '@/lib/prisma'
+import { requireAdminSession } from '@/lib/server/admin-guard'
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions)
-  
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireAdminSession()
+  if (!auth.ok) {
+    console.warn('admin_forbidden', { route: '/api/admin/requests/[id]', status: auth.status })
+    return NextResponse.json(auth.body, { status: auth.status })
   }
 
   const { id } = await params
@@ -32,7 +31,7 @@ export async function PATCH(
       status,
       rejectionReason: status === 'REJECTED' ? rejectionReason : null,
       reviewedAt: new Date(),
-      reviewedBy: session.user?.email || 'admin',
+      reviewedBy: auth.session?.user?.email || 'admin',
     },
   })
 

@@ -5,3 +5,8 @@ out
 dist
 .vercel
 public/uploads
+.atl/
+.playwright-mcp/
+tsconfig.tsbuildinfo
+sdd-verify/
+bun.lock

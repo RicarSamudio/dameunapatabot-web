@@ -32,6 +32,7 @@ enum Status {
 
 enum FormType {
   ADOPTION
+  CAT
   GIVE_UP
   FOSTER
   VOLUNTEER

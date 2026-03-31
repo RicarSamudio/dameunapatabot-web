@@ -1,5 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import { JWT } from 'next-auth/jwt'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
@@ -8,7 +9,21 @@ declare module 'next-auth' {
     user: {
       id: string
       email: string
+      role: 'ADMIN'
     }
+  }
+
+  interface User {
+    id: string
+    email: string
+    role: 'ADMIN'
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id?: string
+    role?: 'ADMIN'
   }
 }
 
@@ -31,7 +46,7 @@ async function getAdmin(email: string, password: string) {
       return null
     }
 
-    return { id: admin.id, email: admin.email }
+    return { id: admin.id, email: admin.email, role: 'ADMIN' as const }
   } finally {
     await prisma.$disconnect()
   }
@@ -62,15 +77,17 @@ export const authOptions: NextAuthOptions = {
     signIn: '/admin/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: { id: string; role: 'ADMIN' } }) {
       if (user) {
         token.id = user.id
+        token.role = user.role
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
+        session.user.role = (token.role as 'ADMIN') || 'ADMIN'
       }
       return session
     }

@@ -13,6 +13,7 @@ const adoptionSchema = z.object({
   direccionCiudad: z.string().min(5, 'La dirección es requerida'),
   edad: z.string(),
   numeroCelular: z.string().min(8, 'El celular es requerido'),
+  email: z.string().email('El email es inválido'),
   instagramFacebook: z.string().optional(),
 
   // Vivienda y familia
@@ -109,6 +110,7 @@ export function AdoptionForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
+          type: 'ADOPTION',
           photos: uploadedPhotos,
         }),
       })
@@ -161,6 +163,14 @@ export function AdoptionForm() {
             <input {...register('numeroCelular')} className="w-full p-3 border rounded-lg" />
             {errors.numeroCelular && <p className="text-[--error] text-sm mt-1">{errors.numeroCelular.message}</p>}
           </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Email *</label>
+            <input type="email" {...register('email')} className="w-full p-3 border rounded-lg" />
+            {errors.email && <p className="text-[--error] text-sm mt-1">{errors.email.message}</p>}
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Instagram / Facebook</label>
             <input {...register('instagramFacebook')} className="w-full p-3 border rounded-lg" />
@@ -332,6 +342,8 @@ export function AdoptionForm() {
           </select>
         </div>
       </div>
+
+      {error && <p className="text-[--error] text-center">{error}</p>}
 
       <button
         type="submit"

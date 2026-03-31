@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
+import { assertDebugAccess } from '@/lib/server/debug-guard'
 
-export async function GET() {
+export async function GET(req: Request) {
+  const access = assertDebugAccess(req)
+  if (!access.ok) {
+    console.warn('debug_denied', { route: '/api/debug' })
+    return access.response
+  }
+
   return NextResponse.json({
-    DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'UNDEFINED',
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? 'SET' : 'UNDEFINED',
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    ok: true,
     NODE_ENV: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
   })
 }

@@ -1,13 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { NextResponse } from 'next/server'
 import { getPrisma } from '@/lib/prisma'
+import { requireAdminSession } from '@/lib/server/admin-guard'
 
 export async function GET(req: Request) {
-  const session = await getServerSession(authOptions)
-  
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireAdminSession()
+  if (!auth.ok) {
+    console.warn('admin_forbidden', { route: '/api/admin/requests', status: auth.status })
+    return NextResponse.json(auth.body, { status: auth.status })
   }
 
   const { searchParams } = new URL(req.url)
