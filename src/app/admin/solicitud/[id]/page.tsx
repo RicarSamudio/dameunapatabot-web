@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface Request {
   id: string
@@ -21,8 +21,9 @@ interface Request {
 }
 
 const typeLabels: Record<string, string> = {
-  ADOPTION: 'Adopcion',
-  GIVE_UP: 'Dar en Adopcion',
+  ADOPTION: 'Adopción',
+  CAT: 'Adopción gato',
+  GIVE_UP: 'Dar en Adopción',
   FOSTER: 'Hogar Temporal',
   VOLUNTEER: 'Voluntariado',
 }
@@ -34,7 +35,7 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 }
 
 export default function SolicitudDetailPage() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const router = useRouter()
   const params = useParams()
   const id = params.id as string
@@ -51,26 +52,27 @@ export default function SolicitudDetailPage() {
     }
   }, [status, router])
 
-  useEffect(() => {
-    if (status === 'authenticated' && id) {
-      fetchRequest()
-    }
-  }, [status, id])
-
-  const fetchRequest = async () => {
+  const fetchRequest = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/requests')
+      const res = await fetch(`/api/admin/requests/${id}`)
       if (res.ok) {
         const data = await res.json()
-        const found = data.find((r: Request) => r.id === id)
-        setRequest(found || null)
+        setRequest(data)
+      } else if (res.status === 404) {
+        setRequest(null)
       }
     } catch (error) {
       console.error('Error fetching request:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [id])
+
+  useEffect(() => {
+    if (status === 'authenticated' && id) {
+      fetchRequest()
+    }
+  }, [status, id, fetchRequest])
 
   const handleApprove = async () => {
     setActionLoading(true)

@@ -68,4 +68,34 @@ describe('GET /api/admin/requests', () => {
     expect(res.status).toBe(200)
     expect(body).toEqual([{ id: 'r1' }])
   })
+
+  it('rejects invalid status filters before querying Prisma', async () => {
+    requireAdminSessionMock.mockResolvedValue({
+      ok: true,
+      session: { user: { email: 'admin@example.com', role: 'ADMIN' } },
+    })
+
+    const req = new Request('http://localhost/api/admin/requests?status=INVALID')
+    const res = await GET(req)
+    const body = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(body).toEqual({ error: 'Invalid status filter' })
+    expect(findManyMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects invalid type filters before querying Prisma', async () => {
+    requireAdminSessionMock.mockResolvedValue({
+      ok: true,
+      session: { user: { email: 'admin@example.com', role: 'ADMIN' } },
+    })
+
+    const req = new Request('http://localhost/api/admin/requests?type=INVALID')
+    const res = await GET(req)
+    const body = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(body).toEqual({ error: 'Invalid type filter' })
+    expect(findManyMock).not.toHaveBeenCalled()
+  })
 })
