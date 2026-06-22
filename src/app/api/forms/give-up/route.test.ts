@@ -35,7 +35,10 @@ describe('POST /api/forms/give-up', () => {
         age: '2',
         sex: 'M',
         description: 'Tiene buen comportamiento y necesita hogar.',
-        photos: ['/uploads/one.jpg', '/uploads/two.jpg'],
+        photos: [
+          '/uploads/66666666-6666-4666-8666-666666666666.jpg',
+          '/uploads/77777777-7777-4777-8777-777777777777.jpg',
+        ],
       }),
     })
 
@@ -47,7 +50,10 @@ describe('POST /api/forms/give-up', () => {
     expect(createMock).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
-          files: ['/uploads/one.jpg', '/uploads/two.jpg'],
+          files: [
+            '/uploads/66666666-6666-4666-8666-666666666666.jpg',
+            '/uploads/77777777-7777-4777-8777-777777777777.jpg',
+          ],
         }),
       })
     )
