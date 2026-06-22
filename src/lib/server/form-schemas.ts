@@ -57,3 +57,15 @@ export const fosterSubmissionSchema = z
     comments: z.string().trim().max(1000).optional().or(z.literal('')),
   })
   .passthrough()
+
+export const volunteerSubmissionSchema = z
+  .object({
+    name: z.string().trim().min(2),
+    phone: phoneSchema,
+    email: z.string().trim().email(),
+    areas: z.array(z.string().trim().min(1)).min(1),
+    availability: z.string().trim().min(2),
+    experience: z.string().trim().min(5),
+    comments: z.string().trim().max(1000).optional().or(z.literal('')),
+  })
+  .passthrough()
