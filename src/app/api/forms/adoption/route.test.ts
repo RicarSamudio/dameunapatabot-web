@@ -38,7 +38,7 @@ describe('POST /api/forms/adoption', () => {
         nombreCompleto: 'Ana Perez',
         numeroCelular: '11223344',
         email: 'ana@example.com',
-        photos: ['/uploads/a.png'],
+        photos: ['/uploads/88888888-8888-4888-8888-888888888888.png'],
       }),
     })
 
@@ -52,7 +52,7 @@ describe('POST /api/forms/adoption', () => {
         data: expect.objectContaining({
           type: 'CAT',
           email: 'ana@example.com',
-          files: ['/uploads/a.png'],
+          files: ['/uploads/88888888-8888-4888-8888-888888888888.png'],
         }),
       })
     )
