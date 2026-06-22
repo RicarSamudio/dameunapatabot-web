@@ -1,7 +1,10 @@
 import { z } from 'zod'
 
-const phoneSchema = z.string().trim().min(8)
-const uploadedPhotoSchema = z.string().trim().min(1).max(512)
+const phoneSchema = z.string().trim().min(8).max(32)
+const uploadedPhotoSchema = z
+  .string()
+  .trim()
+  .regex(/^\/uploads\/[a-f0-9-]+\.(?:jpg|jpeg|png|webp|gif)$/i, 'Invalid upload reference')
 
 const normalizePhotos = (value: unknown): string[] => {
   if (!Array.isArray(value)) return []

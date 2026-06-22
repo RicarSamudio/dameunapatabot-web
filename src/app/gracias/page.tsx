@@ -15,7 +15,15 @@ export default async function GraciasPage({ searchParams }: { searchParams: Prom
           <p className="text-sm text-[--text-muted]">
             Guardá este código para hacer seguimiento:
           </p>
-          <p className="font-mono font-bold text-lg mt-2">{params.token ?? 'N/A'}</p>
+          <p className="font-mono font-bold text-lg mt-2 break-all">{params.token ?? 'N/A'}</p>
+          {params.token && (
+            <Link
+              href={`/estado/${params.token}`}
+              className="inline-block mt-4 text-[--primary] font-medium hover:underline"
+            >
+              Consultar estado de la solicitud
+            </Link>
+          )}
         </div>
         <Link 
           href="/"
