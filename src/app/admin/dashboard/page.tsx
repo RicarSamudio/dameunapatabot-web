@@ -1,8 +1,8 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 
 interface Request {
@@ -18,8 +18,9 @@ interface Request {
 }
 
 const typeLabels: Record<string, string> = {
-  ADOPTION: 'Adopcion',
-  GIVE_UP: 'Dar en Adopcion',
+  ADOPTION: 'Adopción',
+  CAT: 'Adopción gato',
+  GIVE_UP: 'Dar en Adopción',
   FOSTER: 'Hogar Temporal',
   VOLUNTEER: 'Voluntariado',
 }
@@ -44,13 +45,7 @@ export default function DashboardPage() {
     }
   }, [status, router])
 
-  useEffect(() => {
-    if (status === 'authenticated') {
-      fetchRequests()
-    }
-  }, [status, filterStatus, filterType])
-
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       const params = new URLSearchParams()
       if (filterStatus !== 'all') params.set('status', filterStatus)
@@ -66,7 +61,13 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filterStatus, filterType])
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchRequests()
+    }
+  }, [status, fetchRequests])
 
   if (status === 'loading') {
     return (
@@ -86,9 +87,13 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-[--text-muted]">{session?.user?.email}</span>
-            <a href="/admin/login" className="text-sm text-[--primary] hover:underline">
-              Cerrar sesion
-            </a>
+            <button
+              type="button"
+              onClick={() => signOut({ callbackUrl: '/admin/login' })}
+              className="text-sm text-[--primary] hover:underline"
+            >
+              Cerrar sesión
+            </button>
           </div>
         </div>
       </header>
@@ -114,8 +119,9 @@ export default function DashboardPage() {
               className="p-2 border rounded-lg"
             >
               <option value="all">Todos los tipos</option>
-              <option value="ADOPTION">Adopcion</option>
-              <option value="GIVE_UP">Dar en Adopcion</option>
+              <option value="ADOPTION">Adopción perro</option>
+              <option value="CAT">Adopción gato</option>
+              <option value="GIVE_UP">Dar en Adopción</option>
               <option value="FOSTER">Hogar Temporal</option>
               <option value="VOLUNTEER">Voluntariado</option>
             </select>

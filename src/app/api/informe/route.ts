@@ -15,9 +15,9 @@ export async function GET() {
         'Content-Length': String(fileBuffer.length),
       },
     })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: 'File not found', cwd: process.cwd() },
+      { error: 'File not found' },
       { status: 404 }
     )
   }

@@ -1,6 +1,10 @@
+import { FormType, Status } from '@prisma/client'
 import { NextResponse } from 'next/server'
 import { getPrisma } from '@/lib/prisma'
 import { requireAdminSession } from '@/lib/server/admin-guard'
+
+const validStatuses = new Set<string>(Object.values(Status))
+const validTypes = new Set<string>(Object.values(FormType))
 
 export async function GET(req: Request) {
   const auth = await requireAdminSession()
@@ -16,10 +20,16 @@ export async function GET(req: Request) {
   const where: Record<string, unknown> = {}
   
   if (status && status !== 'all') {
+    if (!validStatuses.has(status)) {
+      return NextResponse.json({ error: 'Invalid status filter' }, { status: 400 })
+    }
     where.status = status
   }
   
   if (type && type !== 'all') {
+    if (!validTypes.has(type)) {
+      return NextResponse.json({ error: 'Invalid type filter' }, { status: 400 })
+    }
     where.type = type
   }
 

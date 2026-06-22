@@ -8,7 +8,7 @@ Plataforma web que permite gestionar solicitudes de adopción, hogares temporale
 
 ## Tech Stack
 
-- **Framework:** Next.js 15 (App Router)
+- **Framework:** Next.js 16 (App Router)
 - **Database:** PostgreSQL + Prisma
 - **Styling:** Tailwind CSS
 - **Forms:** React Hook Form + Zod
@@ -38,7 +38,11 @@ npm start
 ## Variables de Entorno
 
 ```env
-DATABASE_URL=postgresql://user:password@host:5432/dameunapatadb
+DATABASE_URL=postgresql://user:***@host:5432/dameunapatadb
+NEXTAUTH_SECRET=replace-with-a-long-random-string
+NEXTAUTH_URL=http://localhost:3000
+DEBUG_API_TOKEN=replace-with-debug-token
+NEXT_PUBLIC_WHATSAPP_NUMBER=595991234567
 ```
 
 ## Estructura
@@ -64,7 +68,13 @@ src/
 
 ## Dashboard Admin
 
-Pendiente de implementación.
+Implementado con NextAuth credentials:
+
+- `/admin/login` — inicio de sesión.
+- `/admin/dashboard` — listado y filtros de solicitudes.
+- `/admin/solicitud/[id]` — detalle, aprobación y rechazo.
+
+Para un entorno nuevo todavía es necesario crear el primer usuario admin en la base de datos con password bcrypt.
 
 ## License
 
