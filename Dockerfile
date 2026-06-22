@@ -54,10 +54,11 @@ RUN npm ci --omit=dev && npx prisma generate
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder /app/scripts ./scripts
 
 # Create uploads directory
-RUN mkdir -p public/uploads
+RUN mkdir -p public/uploads && chmod +x scripts/start-production.sh
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["./scripts/start-production.sh"]

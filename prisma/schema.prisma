@@ -23,6 +23,9 @@ model Request {
   reviewedAt      DateTime?
   reviewedBy      String?
   rejectionReason String?
+
+  @@index([createdAt])
+  @@index([status, type, createdAt])
 }
 
 enum Status {
