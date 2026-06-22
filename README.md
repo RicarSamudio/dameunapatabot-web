@@ -42,6 +42,8 @@ DATABASE_URL=postgresql://user:***@host:5432/dameunapatadb
 NEXTAUTH_SECRET=replace-with-a-long-random-string
 NEXTAUTH_URL=http://localhost:3000
 DEBUG_API_TOKEN=replace-with-debug-token
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=replace-with-a-long-temporary-password
 NEXT_PUBLIC_WHATSAPP_NUMBER=595991234567
 ```
 
@@ -74,7 +76,29 @@ Implementado con NextAuth credentials:
 - `/admin/dashboard` — listado y filtros de solicitudes.
 - `/admin/solicitud/[id]` — detalle, aprobación y rechazo.
 
-Para un entorno nuevo todavía es necesario crear el primer usuario admin en la base de datos con password bcrypt.
+Para un entorno nuevo podés crear o actualizar el primer admin con:
+
+```bash
+ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD='una-password-larga' npm run db:seed
+```
+
+## Base de datos y deploy
+
+Scripts útiles:
+
+```bash
+npm run db:migrate # ejecuta prisma migrate deploy
+npm run db:seed    # crea/actualiza el admin si ADMIN_EMAIL y ADMIN_PASSWORD están definidos
+```
+
+El contenedor Docker ejecuta `prisma migrate deploy` antes de `npm start` mediante `scripts/start-production.sh`.
+
+Checklist mínimo de producción:
+
+1. Configurar `DATABASE_URL`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` en el entorno runtime.
+2. Ejecutar migraciones con `npm run db:migrate` o dejar que el contenedor las ejecute al iniciar.
+3. Crear el usuario admin inicial con `npm run db:seed` y luego rotar/eliminar `ADMIN_PASSWORD` del entorno si no se necesita.
+4. Verificar que `public/uploads` sea persistente o migrar uploads a storage externo antes de abrir el sitio al público.
 
 ## License
 
