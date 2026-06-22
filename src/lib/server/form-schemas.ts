@@ -43,3 +43,17 @@ export const giveUpSubmissionSchema = z
     ...payload,
     photos: normalizePhotos(payload.photos),
   }))
+
+export const fosterSubmissionSchema = z
+  .object({
+    name: z.string().trim().min(2),
+    phone: phoneSchema,
+    email: z.string().trim().email().optional().or(z.literal('')),
+    housingType: z.string().trim().min(2),
+    hasPets: z.string().trim().min(1),
+    hasChildren: z.string().trim().min(1),
+    availability: z.string().trim().min(2),
+    experience: z.string().trim().min(5),
+    comments: z.string().trim().max(1000).optional().or(z.literal('')),
+  })
+  .passthrough()
