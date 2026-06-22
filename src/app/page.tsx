@@ -32,12 +32,20 @@ export default function Home() {
           <p className="text-xl opacity-90 mb-8">
             Somos una organización sin fines de lucro dedicada al rescate y adopción de perros y gatos en Paraguay.
           </p>
-          <Link 
-            href="/adoptar"
-            className="inline-block bg-white text-[--primary] px-8 py-4 rounded-xl font-semibold text-lg hover:bg-opacity-90 transition"
-          >
-            Adoptar una mascota
-          </Link>
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <Link 
+              href="/adoptar"
+              className="inline-block bg-white text-[--primary] px-8 py-4 rounded-xl font-semibold text-lg hover:bg-opacity-90 transition"
+            >
+              Adoptar una mascota
+            </Link>
+            <Link 
+              href="/donaciones"
+              className="inline-block border border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-[--primary] transition"
+            >
+              Hacer una donación
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -73,6 +81,13 @@ export default function Home() {
               <div className="text-4xl mb-4">🤝</div>
               <h3 className="text-xl font-semibold mb-2 text-[--primary]">Quiero Voluntariar</h3>
               <p className="text-[--text-muted]">Sumate al equipo para ayudar con rescates, eventos y más.</p>
+            </Link>
+
+            {/* Donaciones */}
+            <Link href="/donaciones" className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition group md:col-span-2">
+              <div className="text-4xl mb-4">💛</div>
+              <h3 className="text-xl font-semibold mb-2 text-[--primary]">Quiero Donar</h3>
+              <p className="text-[--text-muted]">Ayudá con alimento, veterinaria, traslados y recuperación de animales rescatados.</p>
             </Link>
           </div>
         </div>
