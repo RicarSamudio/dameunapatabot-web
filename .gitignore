@@ -8,5 +8,5 @@ public/uploads
 .atl/
 .playwright-mcp/
 tsconfig.tsbuildinfo
-sdd-verify/
+/sdd-verify/
 bun.lock

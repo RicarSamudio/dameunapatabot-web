@@ -110,6 +110,22 @@ Checklist mínimo de producción:
 3. Crear el usuario admin inicial con `npm run db:seed` y luego rotar/eliminar `ADMIN_PASSWORD` del entorno si no se necesita.
 4. Verificar que `public/uploads` sea persistente o migrar uploads a storage externo antes de abrir el sitio al público.
 
+## Desarrollo asistido con Gentle AI
+
+Este repositorio incluye configuración de workspace para Hermes en `.hermes/`, con SDD, skills de proyecto, persona y memoria Engram. Esto afecta únicamente el flujo de desarrollo y no modifica el runtime de Next.js.
+
+Después de instalar [Gentle AI v1.48.0](https://github.com/Gentleman-Programming/gentle-ai/releases/tag/v1.48.0), verificá la versión y sincronizá el workspace con:
+
+```bash
+gentle-ai --version # debe imprimir 1.48.0
+gentle-ai install --agent hermes --scope workspace \
+  --components engram,sdd,skills,persona --persona gentleman
+gentle-ai skill-registry refresh
+engram doctor --project dameunapatabot-web
+```
+
+Los artefactos temporales de `.atl/` y la base local de Engram no se versionan.
+
 ## License
 
 ISC
