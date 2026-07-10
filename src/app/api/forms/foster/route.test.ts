@@ -21,7 +21,7 @@ describe('POST /api/forms/foster', () => {
   })
 
   it('persists foster applications as FOSTER requests', async () => {
-    createMock.mockResolvedValue({ id: 'foster-req-1' })
+    createMock.mockResolvedValue({ id: 'foster-req-1', token: 'foster-token-123' })
 
     const req = new Request('http://localhost/api/forms/foster', {
       method: 'POST',

@@ -21,7 +21,7 @@ describe('POST /api/forms/give-up', () => {
   })
 
   it('persists uploaded photos into files', async () => {
-    createMock.mockResolvedValue({ id: 'req-2' })
+    createMock.mockResolvedValue({ id: 'req-2', token: 'token-456' })
 
     const req = new Request('http://localhost/api/forms/give-up', {
       method: 'POST',

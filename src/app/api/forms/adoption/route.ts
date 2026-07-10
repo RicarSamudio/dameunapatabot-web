@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPrisma } from '@/lib/prisma'
 import { randomUUID } from 'crypto'
 import { FormType } from '@prisma/client'
 import { adoptionSubmissionSchema } from '@/lib/server/form-schemas'
+import { createIdempotentRequest, idempotencyErrorResponse } from '@/lib/server/idempotent-request'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,12 +25,9 @@ export async function POST(req: NextRequest) {
     }
 
     const payload = parsed.data
-    const prisma = getPrisma()
-
     const token = randomUUID()
 
-    const request = await prisma.request.create({
-      data: {
+    const request = await createIdempotentRequest(req, {
         token,
         type: payload.type as unknown as FormType,
         status: 'PENDING',
@@ -39,11 +36,12 @@ export async function POST(req: NextRequest) {
         email: payload.email,
         data: payload,
         files: payload.photos,
-      },
     })
 
-    return NextResponse.json({ token, id: request.id })
+    return NextResponse.json({ token: request.token, id: request.id })
   } catch (error) {
+    const idempotencyResponse = idempotencyErrorResponse(error)
+    if (idempotencyResponse) return idempotencyResponse
     console.error('Error creating adoption request:', error)
     return NextResponse.json({ error: 'Error creating request' }, { status: 500 })
   }
