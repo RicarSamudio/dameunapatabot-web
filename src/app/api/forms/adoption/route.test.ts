@@ -28,7 +28,7 @@ describe('POST /api/forms/adoption', () => {
   })
 
   it('persists CAT type, canonical email and photos', async () => {
-    createMock.mockResolvedValue({ id: 'req-1' })
+    createMock.mockResolvedValue({ id: 'req-1', token: 'token-123' })
 
     const req = new Request('http://localhost/api/forms/adoption', {
       method: 'POST',

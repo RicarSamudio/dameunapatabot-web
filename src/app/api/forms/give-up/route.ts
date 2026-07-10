@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPrisma } from '@/lib/prisma'
 import { randomUUID } from 'crypto'
 import { giveUpSubmissionSchema } from '@/lib/server/form-schemas'
+import { createIdempotentRequest, idempotencyErrorResponse } from '@/lib/server/idempotent-request'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,13 +23,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const prisma = getPrisma()
     const { name, phone, email, animalType, breed, age, sex, description, photos } = parsed.data
 
     const token = randomUUID()
 
-    const request = await prisma.request.create({
-      data: {
+    const request = await createIdempotentRequest(req, {
         token,
         type: 'GIVE_UP',
         status: 'PENDING',
@@ -44,11 +42,12 @@ export async function POST(req: NextRequest) {
           description,
         },
         files: photos,
-      },
     })
 
-    return NextResponse.json({ token, id: request.id })
+    return NextResponse.json({ token: request.token, id: request.id })
   } catch (error) {
+    const idempotencyResponse = idempotencyErrorResponse(error)
+    if (idempotencyResponse) return idempotencyResponse
     console.error('Error creating give-up request:', error)
     return NextResponse.json({ error: 'Error creating request' }, { status: 500 })
   }

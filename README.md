@@ -61,6 +61,16 @@ src/
     └── forms/            # Componentes de formularios
 ```
 
+## Idempotencia de formularios
+
+Los endpoints `POST /api/forms/*` aceptan opcionalmente:
+
+```http
+Idempotency-Key: <identificador estable de 16 a 128 caracteres>
+```
+
+Repetir la misma key y payload devuelve la solicitud original. Reutilizarla con otro payload devuelve `409 IDEMPOTENCY_CONFLICT`. El índice único persistente evita duplicados tras reinicios, réplicas o respuestas de red perdidas.
+
 ## Formularios
 
 - [x] Adopción

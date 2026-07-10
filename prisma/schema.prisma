@@ -23,6 +23,8 @@ model Request {
   reviewedAt      DateTime?
   reviewedBy      String?
   rejectionReason String?
+  idempotencyKey  String?   @unique
+  idempotencyHash String?
 
   @@index([createdAt])
   @@index([status, type, createdAt])
