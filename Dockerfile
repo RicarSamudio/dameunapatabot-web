@@ -7,15 +7,10 @@ RUN apt-get update -y \
   && apt-get install -y --no-install-recommends openssl ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-# Build arguments from Coolify
-ARG DATABASE_URL
-ARG NEXTAUTH_SECRET
-ARG NEXTAUTH_URL
-
-# Needed at build time for Prisma generate and next build
-ENV DATABASE_URL=${DATABASE_URL}
-ENV NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-ENV NEXTAUTH_URL=${NEXTAUTH_URL}
+# Runtime secrets are intentionally not declared as ARG/ENV here.
+# Dokploy injects DATABASE_URL, NEXTAUTH_SECRET and NEXTAUTH_URL when the
+# production container starts; baking them into the builder would leak secrets
+# and turns missing build args into invalid empty-string configuration.
 
 # Copy package files first (layer cache)
 COPY package.json package-lock.json ./
